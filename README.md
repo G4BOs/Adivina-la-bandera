@@ -13,8 +13,9 @@ Juego de Trivia de banderas Multijugador
 
 ## Cómo ejecutar
 1. Instalar dependecias: `pip install flask flask-socketio`
-2. Ejecutar: `python3 app.py`
-3. Abrir el navegador: `http://localhost:5001` `(o ip del host en el puerto 5001`
+2. Descomprimir el .zip de la carpeta `static/images`
+3. Ejecutar: `python3 app.py`
+4. Abrir el navegador: `http://localhost:5001` `(o ip del host en el puerto 5001)`
 
 ## Funcionalidad
 
