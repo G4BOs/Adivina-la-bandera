@@ -2,14 +2,14 @@
 Juego de Trivia de banderas Multijugador
 
 ## Tecnologías
--Python (Flask)
--Socket.IO
--HTML/CSS/JavaScript
+- Python (Flask)
+- Socket.IO
+- HTML/CSS/JavaScript
 
 ## Caracteristicas
--Sincronizacion en tiempo real entre multiples jugadores
--Verificacion de respuestas del lado del servidor
--Notificacion instantanea del ganador
+- Sincronizacion en tiempo real entre multiples jugadores
+- Verificacion de respuestas del lado del servidor
+- Notificacion instantanea del ganador
 
 ## Cómo ejecutar
 1. Instalar dependecias: `pip install flask flask-socketio`
