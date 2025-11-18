@@ -1,0 +1,21 @@
+* {
+    background-color: rgba(30,5,150,1);
+    text-align: center;
+    color: white
+}
+
+.container {
+    min-width: 90vw;
+    min-height: 90vh;
+    border: 1px solid black;
+}
+
+#bandera {
+    width: 256px;
+    height: 192px;
+    background-size:cover;
+    background-repeat: no-repeat;
+    margin: auto;
+
+}
+
