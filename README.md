@@ -19,4 +19,4 @@ Juego de Trivia de banderas Multijugador
 
 ## Funcionalidad
 
-Los jugadores ven la misma bandera simultaneamente, escribe su respuesta y el sistema verifica quien respondio correctamente
+Los jugadores ven la misma bandera simultaneamente, eligen el pais y el sistema verifica quien respondio correctamente
