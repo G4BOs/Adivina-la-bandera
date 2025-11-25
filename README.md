@@ -1,4 +1,4 @@
-# Adivina-la-bandera  V 0.1
+# Adivina-la-bandera  V 1
 Juego de Trivia de banderas Multijugador
 
 ## Tecnologías
