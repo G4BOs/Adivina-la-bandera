@@ -3,6 +3,8 @@
 import time
 from flask import Flask, request, jsonify, render_template, request_tearing_down
 from flask_socketio import SocketIO, emit, send
+from flask_cors import CORS
+import os
 from pathlib import Path
 import json
 import random
@@ -13,8 +15,9 @@ lista_de_opciones = []
 
 #define la app Flask
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'clave-secreta'
-socketio = SocketIO(app, cors_allowed_origins='*')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY','dev-secret-key-change-in-production')
+socketio = SocketIO(app, cors_allowed_origins='*',async_mode='eventlet',logger=True,engineio_logger=True)
+CORS(app)
 
 #Ruta del index
 @app.route('/')
