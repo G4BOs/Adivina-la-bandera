@@ -1,13 +1,12 @@
 * {
-    background-color: rgba(30,5,150,1);
+    background-color: #0D1B2A;
     text-align: center;
-    color: white
+    color: #E0E1DD
 }
 
 .container {
     min-width: 90vw;
-    min-height: 90vh;
-    border: 1px solid black;
+    background-color: #00102079;
 }
 
 #bandera {
@@ -19,3 +18,38 @@
 
 }
 
+header{
+    width: 100vw;
+    height: 50px;
+    text-align: center;
+}
+
+
+#opciones{
+    min-width: 50%;
+    min-height: 200px;
+    max-width: 400px;
+    max-height: 400px;
+    margin: auto;
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+}
+
+.opcion{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1px;
+    border: 3px solid #001020;
+    border-radius: 14px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.opcion:hover{
+    background-color: #001020;
+}
+
+.opcion:active{
+    background-color: rgb(0, 39, 78);
+}
