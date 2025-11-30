@@ -1,32 +1,61 @@
-#AÑADIDO DESDE EDITOR DE CODIGO EN ANDROID
-#Hola dani
+
 #Importaciones
 import time
-from flask import Flask, request, jsonify, render_template, request_tearing_down
+from flask import Flask, request, jsonify, render_template, request_tearing_down, session
 from flask_socketio import SocketIO, emit, send
-from flask_cors import CORS
-import os
 from pathlib import Path
 import json
 import random
+import secrets
 
 
-lista_de_usuarios = []
-lista_de_opciones = []
+lista_de_usuarios = {}
+puntuacion = {}
+
 
 #define la app Flask
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY','dev-secret-key-change-in-production')
-socketio = SocketIO(app, cors_allowed_origins='*',async_mode='eventlet',logger=True,engineio_logger=True)
-CORS(app)
+app.config['SECRET_KEY'] = 'clave-secreta'
+socketio = SocketIO(app, cors_allowed_origins='*')
 
 #Ruta del index
 @app.route('/')
 def index():
+    if 'user_id' not in session:
+        session['user_id'] = secrets.token_urlsafe(16)
+        
     return render_template('index.html')
 
 
+""""
+RONDA ACTUAL
+"""
 
+ronda_actual = {
+    'pais': {},
+    'opciones':[],
+    'betado': []
+}
+
+#Generar Ronda
+def generar_ronda():
+    ronda_actual['pais'] = sortear_pais()
+    ronda_actual['opciones'] = sortear_opciones(ronda_actual['pais'])
+    ronda_actual['betado'] = []
+
+#Actualizar puntos
+def puntos_totales():
+    indice = 1
+    global puntuacion
+    for jugador in lista_de_usuarios:
+        puntuacion[f'jugador_{indice}']['punto'] = 0
+        puntuacion[f'jugador_{indice}']['id'] = jugador
+
+
+
+
+
+puntos_totales()
 
 # CARGAR PAISES
 ruta = Path('static/json/paises.json')
@@ -40,10 +69,23 @@ def sortear_pais():
 
 pais_a_adivinar = sortear_pais()
 
+
+#Verifica ususario nuevo conectado
+def verificar_id(id):
+    """Funcion para verificar si una id ya esta previamente conectado y devuelve su numero"""
+    for user in puntuacion:
+        if puntuacion[user]['id'] == id:
+            return puntuacion[user]['mi_numero']
+    return len(puntuacion)+1
+
+
+
 #Sortear opciones
 def sortear_opciones(correcto):
-    global lista_de_opciones
-    lista_de_opciones.append(correcto)
+    """Funcion para sortear 4 opciones aleatorias donde la correcta se pasa como argumento"""
+    
+    lista_de_opciones = []
+    lista_de_opciones.append(correcto['nombre'])
     for i in range(3):
         selecionado = sortear_pais()['nombre']
         
@@ -53,29 +95,43 @@ def sortear_opciones(correcto):
                 break
         
         lista_de_opciones.append(selecionado)
-        random.shuffle(lista_de_opciones)
+    random.shuffle(lista_de_opciones)
+    return lista_de_opciones
 
 
 
 #Socket que resive señal para cambiar de pais
 @socketio.on('cambiar_pais')
 def cambiar_pais():
-    global lista_de_opciones
-    lista_de_opciones.clear()
-    global pais_a_adivinar
-    pais_a_adivinar = sortear_pais()
-    sortear_opciones(pais_a_adivinar['nombre'])
-    emit('set_opciones',{'correcto': pais_a_adivinar, 'opciones': lista_de_opciones},broadcast=True)
+    generar_ronda()
+    emit('set_opciones',{'correcto': ronda_actual['pais'], 'opciones': ronda_actual['opciones'],'betado':ronda_actual['betado'],'puntuacion':puntuacion},broadcast=True)
     
 
 #Socket que envia el resultado a todos los usuarios    
 @socketio.on('resultado')
 def resultado(data):
-    if data == pais_a_adivinar['nombre']:
-        emit('decir_resultado', request.sid, broadcast=True)    
-    else:
-        emit('nada','nada')
     
+    
+    if str(data['entrada']) == ronda_actual['pais']['nombre'] and str(data['id']) not in ronda_actual['betado']:
+        
+
+        puntuacion[f'jugador {data["jugador"]}']['punto'] += 1
+        
+        emit('decir_resultado', puntuacion, broadcast=True)
+        emit('mi_id',{'id':data['id'],'betado': (data['id'] in ronda_actual['betado']),'mi_numero':data['jugador']})    
+    else:
+        
+        if data['id'] not in ronda_actual['betado']:
+            ronda_actual['betado'].append(data['id'])
+        if len(lista_de_usuarios) == len(ronda_actual['betado']):
+            time.sleep(3)
+
+            print(puntuacion)
+            emit('decir_resultado',puntuacion, broadcast=True)
+        
+        emit('mi_id',{'id':data['id'],'betado': (data['id'] in ronda_actual['betado']),'mi_numero':data['jugador']})
+    
+
 
 
 
@@ -84,20 +140,34 @@ def get_contry(data):
     global lista_de_opciones
     lista_de_opciones.clear()
     sortear_opciones(pais_a_adivinar['nombre'])
-    emit('set_opciones',{'correcto': pais_a_adivinar, 'opciones': lista_de_opciones}, broadcast=True)
+    emit('set_opciones',{'correcto': ronda_actual['pais'], 'opciones': ronda_actual['opciones'],'betado':ronda_actual['betado'],'puntuacion':puntuacion}, broadcast=True)
 
 @socketio.on('connect')
 def handle_connect():
-    global lista_de_opciones
-    lista_de_opciones.clear()
-    sortear_opciones(pais_a_adivinar['nombre'])
+    user_id = session.get('user_id')
+    lista_de_usuarios[user_id] = request.sid
     
-    if pais_a_adivinar:
-        emit('set_opciones', {'correcto': pais_a_adivinar, 'opciones': lista_de_opciones},broadcast=True)
-    else:
-        emit('set_opciones', {'correcto': pais_a_adivinar, 'opciones': lista_de_opciones},broadcast=True)
-        emit('decir_pais', pais_a_adivinar,broadcast=True)
+    mi_numero = verificar_id(user_id)
+    puntos = 0
+    if f'jugador {mi_numero}' in puntuacion:
+        if 'punto' in puntuacion[f'jugador {mi_numero}']:
+            puntos = puntuacion[f'jugador {mi_numero}']['punto']
+    
+    
+    puntuacion[f'jugador {mi_numero}'] = {'id': user_id , 'punto': puntos, 'mi_numero': mi_numero}
+    
 
+
+    
+
+
+    if ronda_actual['pais']:
+        emit('set_opciones', {'correcto': ronda_actual['pais'], 'opciones': ronda_actual['opciones'],'betado':ronda_actual['betado'],'puntuacion':puntuacion},broadcast=True)
+    else:
+        generar_ronda()
+        emit('set_opciones', {'correcto': ronda_actual['pais'], 'opciones': ronda_actual['opciones'],'betado':ronda_actual['betado'],'puntuacion':puntuacion },broadcast=True)
+        emit('decir_pais', ronda_actual['pais'],broadcast=True)
+    emit('mi_id',{'id':user_id,'betado': (user_id in ronda_actual['betado']), 'mi_numero': mi_numero})
 
 '''@socketio.on('unirse_como')
 def add_usser(data):
