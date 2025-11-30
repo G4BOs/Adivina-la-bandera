@@ -7,6 +7,7 @@ from pathlib import Path
 import json
 import random
 import secrets
+import os
 
 
 lista_de_usuarios = {}
@@ -15,8 +16,8 @@ puntuacion = {}
 
 #define la app Flask
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'clave-secreta'
-socketio = SocketIO(app, cors_allowed_origins='*')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+socketio = SocketIO(app, cors_allowed_origins='*',async_mode='eventlet')
 
 #Ruta del index
 @app.route('/')
@@ -185,4 +186,5 @@ def add_usser(data):
 
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5001)
+    port = int(os.environ.get('PORT',5000))
+    socketio.run(app, host='0.0.0.0', port=port)
