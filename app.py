@@ -1,4 +1,3 @@
-
 #Importaciones
 import time
 from flask import Flask, request, jsonify, render_template, request_tearing_down, session
@@ -8,6 +7,8 @@ import json
 import random
 import secrets
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 
 lista_de_usuarios = {}
@@ -16,7 +17,7 @@ puntuacion = {}
 
 #define la app Flask
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback-dev-key')
 socketio = SocketIO(app, cors_allowed_origins='*', async_mode='gevent')
 
 #Ruta del index
