@@ -53,3 +53,7 @@ header{
 .opcion:active{
     background-color: rgb(0, 39, 78);
 }
+
+.punto{
+    margin-left: 20px;
+}
