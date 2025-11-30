@@ -40,12 +40,14 @@ ronda_actual = {
 
 #Generar Ronda
 def generar_ronda():
+    """Funcion que genera una ronda nueva con pais y opciones"""
     ronda_actual['pais'] = sortear_pais()
     ronda_actual['opciones'] = sortear_opciones(ronda_actual['pais'])
     ronda_actual['betado'] = []
 
 #Actualizar puntos
 def puntos_totales():
+    """Actualiza la variable puntuacion"""
     indice = 1
     global puntuacion
     for jugador in lista_de_usuarios:

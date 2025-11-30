@@ -1,5 +1,7 @@
-# Adivina-la-bandera  V 1
+# Adivina-la-bandera  V 2
 Juego de Trivia de banderas Multijugador
+
+## Juego Web: https://adivina-la-bandera-0wt9.onrender.com
 
 ## Tecnologías
 - Python (Flask)
@@ -15,8 +17,11 @@ Juego de Trivia de banderas Multijugador
 1. Instalar dependecias: `pip install flask flask-socketio`
 2. Descomprimir el .zip de la carpeta `static/images`
 3. Ejecutar: `python3 app.py`
-4. Abrir el navegador: `http://localhost:5001` `(o ip del host en el puerto 5001)`
+4. Abrir el navegador: `http://localhost:5000` `(o ip del host en el puerto 5000)`
 
 ## Funcionalidad
 
 Los jugadores ven la misma bandera simultaneamente, eligen el pais y el sistema verifica quien respondio correctamente
+
+## Mejoras pendientes:
+-Manejo de coneccion y desconeccion

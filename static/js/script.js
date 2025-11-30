@@ -68,7 +68,6 @@ function cambiarBandera(){
 };
 
 function resultado_decir(entrada){
-    console.log(mi_numero);
     socket.emit('resultado', {'entrada':entrada,'id':mi_id_web, 'jugador':mi_numero}  );
 };
 
@@ -82,7 +81,6 @@ const contenedor_de_opciones = document.getElementById('opciones');
 function cargar_opciones(){
     contenedor_de_opciones.replaceChildren();
     for (let pais in opciones){
-        console.log(opciones[pais]);
         const opcion = document.createElement("div");
         opcion.className =  'opcion';
         opcion.id = `opcion_${pais}`;
@@ -116,7 +114,6 @@ const cuadro_de_puntos = document.getElementById('puntos');
 function cargar_puntuacion(){
     cuadro_de_puntos.replaceChildren();
     for (let puntos in puntuaciones){
-        console.log(puntuaciones[puntos],puntos);
 
         var txt_puntos = document.createElement('p');
         txt_puntos.style.display = 'inline';
