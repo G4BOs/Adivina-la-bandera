@@ -17,7 +17,7 @@ puntuacion = {}
 #define la app Flask
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
-socketio = SocketIO(app, cors_allowed_origins='*',async_mode='eventlet')
+socketio = SocketIO(app, cors_allowed_origins='*', async_mode='gevent')
 
 #Ruta del index
 @app.route('/')
