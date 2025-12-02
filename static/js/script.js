@@ -1,6 +1,7 @@
 
 const socket = io();
 
+
 const div_bandera = document.getElementById('bandera');
 
 const resultado_txt = document.getElementById('resultadoo');

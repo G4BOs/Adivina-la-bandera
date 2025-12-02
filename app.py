@@ -46,6 +46,8 @@ def generar_ronda():
     ronda_actual['opciones'] = sortear_opciones(ronda_actual['pais'])
     ronda_actual['betado'] = []
 
+
+
 #Actualizar puntos
 def puntos_totales():
     """Actualiza la variable puntuacion"""
@@ -130,7 +132,7 @@ def resultado(data):
         if len(lista_de_usuarios) == len(ronda_actual['betado']):
             time.sleep(3)
 
-            print(puntuacion)
+            
             emit('decir_resultado',puntuacion, broadcast=True)
         
         emit('mi_id',{'id':data['id'],'betado': (data['id'] in ronda_actual['betado']),'mi_numero':data['jugador']})
@@ -148,6 +150,7 @@ def get_contry(data):
 
 @socketio.on('connect')
 def handle_connect():
+    global user_id
     user_id = session.get('user_id')
     lista_de_usuarios[user_id] = request.sid
     
@@ -172,6 +175,24 @@ def handle_connect():
         emit('set_opciones', {'correcto': ronda_actual['pais'], 'opciones': ronda_actual['opciones'],'betado':ronda_actual['betado'],'puntuacion':puntuacion },broadcast=True)
         emit('decir_pais', ronda_actual['pais'],broadcast=True)
     emit('mi_id',{'id':user_id,'betado': (user_id in ronda_actual['betado']), 'mi_numero': mi_numero})
+
+
+
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    user_id = session.get('user_id')
+
+    print(lista_de_usuarios)
+        
+    usuario_que_se_fue = lista_de_usuarios.pop(user_id)
+
+    for jugador in puntuacion:
+        if user_id == puntuacion[jugador]['id']:
+            se_fue = jugador
+    puntuacion.pop(se_fue)
+
+    emit('set_opciones', {'correcto': ronda_actual['pais'], 'opciones': ronda_actual['opciones'],'betado':ronda_actual['betado'],'puntuacion':puntuacion },broadcast=True)
 
 '''@socketio.on('unirse_como')
 def add_usser(data):

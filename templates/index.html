@@ -34,7 +34,14 @@
         </div>
     
     </body>
-
+    <script>
+    window.onbeforeunload =(e)=>{
+    console.log(e);
+    e.preventDefault();
+    e.returnValue = '';
+    return;
+    };
+    </script>
     <script src="/static/js/socket.io.min.js"></script>
     <script src="/static/js/script.js"></script>
 
