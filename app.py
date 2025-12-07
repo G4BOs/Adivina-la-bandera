@@ -1,6 +1,6 @@
 #Importaciones
 import time
-from flask import Flask, request, jsonify, render_template, request_tearing_down, session
+from flask import Flask, request, jsonify, render_template, request_tearing_down, session, redirect
 from flask_socketio import SocketIO, emit, send
 from pathlib import Path
 import json
@@ -26,8 +26,17 @@ def index():
     if 'user_id' not in session:
         session['user_id'] = secrets.token_urlsafe(16)
         
-    return render_template('index.html')
+    return render_template('loggin.html')
 
+@app.route('/unirse',methods=["POST"])
+def saludar():
+    session['mi_nombre'] = request.form['nombre']
+    return redirect('/juego')
+
+
+@app.route('/juego')
+def loggin():
+    return render_template('juego.html')
 
 """"
 RONDA ACTUAL
@@ -124,7 +133,7 @@ def resultado(data):
         puntuacion[f'jugador {data["jugador"]}']['punto'] += 1
         
         emit('decir_resultado', puntuacion, broadcast=True)
-        emit('mi_id',{'id':data['id'],'betado': (data['id'] in ronda_actual['betado']),'mi_numero':data['jugador']})    
+        emit('mi_id',{'id':data['id'],'betado': (data['id'] in ronda_actual['betado']),'mi_numero':data['jugador'],'nombre': session.get("mi_nombre")})    
     else:
         
         if data['id'] not in ronda_actual['betado']:
@@ -135,7 +144,7 @@ def resultado(data):
             
             emit('decir_resultado',puntuacion, broadcast=True)
         
-        emit('mi_id',{'id':data['id'],'betado': (data['id'] in ronda_actual['betado']),'mi_numero':data['jugador']})
+        emit('mi_id',{'id':data['id'],'betado': (data['id'] in ronda_actual['betado']),'mi_numero':data['jugador'],'nombre': session.get("mi_nombre")})
     
 
 
@@ -161,7 +170,7 @@ def handle_connect():
             puntos = puntuacion[f'jugador {mi_numero}']['punto']
     
     
-    puntuacion[f'jugador {mi_numero}'] = {'id': user_id , 'punto': puntos, 'mi_numero': mi_numero}
+    puntuacion[f'jugador {mi_numero}'] = {'id': user_id , 'punto': puntos, 'mi_numero': mi_numero, 'nombre': session.get('mi_nombre')}
     
 
 
@@ -174,7 +183,7 @@ def handle_connect():
         generar_ronda()
         emit('set_opciones', {'correcto': ronda_actual['pais'], 'opciones': ronda_actual['opciones'],'betado':ronda_actual['betado'],'puntuacion':puntuacion },broadcast=True)
         emit('decir_pais', ronda_actual['pais'],broadcast=True)
-    emit('mi_id',{'id':user_id,'betado': (user_id in ronda_actual['betado']), 'mi_numero': mi_numero})
+    emit('mi_id',{'id':user_id,'betado': (user_id in ronda_actual['betado']), 'mi_numero': mi_numero,'nombre': session.get("mi_nombre")})
 
 
 
@@ -183,7 +192,6 @@ def handle_connect():
 def handle_disconnect():
     user_id = session.get('user_id')
 
-    print(lista_de_usuarios)
         
     usuario_que_se_fue = lista_de_usuarios.pop(user_id)
 
@@ -194,19 +202,6 @@ def handle_disconnect():
 
     emit('set_opciones', {'correcto': ronda_actual['pais'], 'opciones': ronda_actual['opciones'],'betado':ronda_actual['betado'],'puntuacion':puntuacion },broadcast=True)
 
-'''@socketio.on('unirse_como')
-def add_usser(data):
-    if lista_de_usuarios:
-        for user in lista_de_usuarios:
-            if user['nombre'] == data['nombre']:
-                emit('usuario_registrado', user['nombre'])
-            else:
-                datos = {'nombre': data['nombre'], 'uid': request.sid}
-                emit('usuario_registrado', user['nombre'])
-    else:
-                datos = {'nombre': data['nombre'], 'uid': request.sid}
-                emit('usuario_registrado', user['nombre'])
-'''
 
 
 if __name__ == '__main__':

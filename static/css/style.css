@@ -1,7 +1,9 @@
 * {
     background-color: #0D1B2A;
     text-align: center;
-    color: #E0E1DD
+    color: #E0E1DD;
+    font-family: Arial, Helvetica, sans-serif;
+
 }
 
 .container {
@@ -33,6 +35,7 @@ header{
     margin: auto;
     display: grid;
     grid-template-rows: 1fr 1fr 1fr 1fr;
+
 }
 
 .opcion{
@@ -56,4 +59,5 @@ header{
 
 .punto{
     margin-left: 20px;
+    font-size: 24px;
 }

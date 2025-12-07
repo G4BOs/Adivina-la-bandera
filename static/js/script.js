@@ -17,6 +17,7 @@ var puntuaciones = {};
 var registrado = false;
 var mi_id_web = '';
 var mi_numero = 0;
+var mi_nombre = '';
 var betado = false;
 
 
@@ -38,6 +39,7 @@ socket.on('decir_resultado',function(data){
 socket.on('mi_id',function(data){
     mi_id_web = data.id;
     betado = data.betado;
+    mi_nombre = data.nombre;
     if (data.mi_numero){mi_numero = data.mi_numero;};
     
 })
@@ -119,7 +121,10 @@ function cargar_puntuacion(){
         var txt_puntos = document.createElement('p');
         txt_puntos.style.display = 'inline';
         txt_puntos.className= 'punto';
-        txt_puntos.innerText = `${puntos}: ${puntuaciones[puntos].punto}`
+        txt_puntos.innerText = `${puntuaciones[puntos].nombre}: ${puntuaciones[puntos].punto}`
+        if (puntuaciones[puntos].nombre == mi_nombre){
+            txt_puntos.style.color = 'rgba(5, 248, 127, 1)';
+        };
         cuadro_de_puntos.appendChild(txt_puntos)
 
         
